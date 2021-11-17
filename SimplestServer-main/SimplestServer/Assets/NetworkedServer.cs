@@ -159,9 +159,9 @@ public class NetworkedServer : MonoBehaviour
         {
             GameRoom gr = GetGameRoomWithClientID(id);
 
-            if(gr != null)
+            if (gr != null)
             {
-                if(gr.playerID1 ==id)
+                if (gr.playerID1 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.OpponentPlay + "", gr.playerID2);
                 }
@@ -171,10 +171,82 @@ public class NetworkedServer : MonoBehaviour
                 }
             }
         }
+        else if (Signifier == ClientToServerSignifier.QuickChatOne)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
 
-
-
+            if (gr != null)
+            {
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID1);
+                }
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID2);
+                }
+            }
         }
+        else if (Signifier == ClientToServerSignifier.QuickChatTwo)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+
+            if (gr != null)
+            {
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID1);
+                }
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID2);
+                }
+            }
+        }
+        else if (Signifier == ClientToServerSignifier.QuickChatThree)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+
+            if (gr != null)
+            {
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID1);
+                }
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID2);
+                }
+            }
+        }
+        else if (Signifier == ClientToServerSignifier.QuickChatFour)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+
+            if (gr != null)
+            {
+                if (gr.playerID1 == id)
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID1);
+                }
+                else
+                {
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID2);
+                }
+            }
+        }
+
+
+
+    }
     public void SavePlayerAccount()
     {
         StreamWriter sw = new StreamWriter(playerAccountsFilePath);
@@ -220,6 +292,10 @@ public static class ClientToServerSignifier
     public const int Login = 2;
     public const int JoinQueueForGame = 3; 
     public const int TicTacToeSomethingPlay = 4;
+    public const int QuickChatOne = 5;
+    public const int QuickChatTwo = 6;
+    public const int QuickChatThree = 7;
+    public const int QuickChatFour = 8;
 }
 public static class ServerToClientSignifier
 {
@@ -229,6 +305,14 @@ public static class ServerToClientSignifier
     public const int AccountCreationFailed = 4;
     public const int GameStart = 5;
     public const int OpponentPlay = 6;
+    public const int QuickChatOneRecieved = 7;
+    public const int QuickChatTwoRecieved = 8;
+    public const int QuickChatThreeRecieved = 9;
+    public const int QuickChatFourRecieved = 10;
+    public const int QuickChatOneSent = 11;
+    public const int QuickChatTwoSent = 12;
+    public const int QuickChatThreeSent = 13;
+    public const int QuickChatFourSent = 14;
 }
 public class PlayerAccount
 {
