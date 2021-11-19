@@ -17,7 +17,7 @@ public class NetworkedServer : MonoBehaviour
     const int playerAccountRecord = 1;
     string playerAccountsFilePath;
     int playerWaitingForMatchWithID = -1;
-    LinkedList<GameRoom> gameRooms;
+    List<GameRoom> gameRooms;
     
     // Start is called before the first frame update
     void Start()
@@ -32,7 +32,7 @@ public class NetworkedServer : MonoBehaviour
         playerAccounts = new LinkedList<PlayerAccount>();
         LoadPlayerAccounts();
 
-        gameRooms = new LinkedList<GameRoom>();
+        gameRooms = new List<GameRoom>();
     }
 
     // Update is called once per frame
@@ -147,7 +147,7 @@ public class NetworkedServer : MonoBehaviour
             else
             {
                 GameRoom gr = new GameRoom(playerWaitingForMatchWithID, id);
-                gameRooms.AddLast(gr);
+                gameRooms.Add(gr);
 
                 SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID1);
                 SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID2);
@@ -243,7 +243,15 @@ public class NetworkedServer : MonoBehaviour
                 }
             }
         }
-
+        else if (Signifier == ClientToServerSignifier.JoinQueueToObserve)
+        {
+           if(gameRooms.Count>0)
+            {
+                gameRooms[Random.Range(0, gameRooms.Count)].observersID.Add(id);
+                SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
+                GameRoom gr = GetGameRoomWithClientID(id);
+            }
+        }
 
 
     }
@@ -296,6 +304,7 @@ public static class ClientToServerSignifier
     public const int QuickChatTwo = 6;
     public const int QuickChatThree = 7;
     public const int QuickChatFour = 8;
+    public const int JoinQueueToObserve = 9;
 }
 public static class ServerToClientSignifier
 {
@@ -313,6 +322,7 @@ public static class ServerToClientSignifier
     public const int QuickChatTwoSent = 12;
     public const int QuickChatThreeSent = 13;
     public const int QuickChatFourSent = 14;
+    public const int ObserveStart = 15;
 }
 public class PlayerAccount
 {
@@ -326,6 +336,7 @@ public class PlayerAccount
 
 public class GameRoom
 {
+    public List<int> observersID = new List<int>();
     public int playerID1, playerID2;
 
     public GameRoom(int PlayerID1, int PlayerID2)
