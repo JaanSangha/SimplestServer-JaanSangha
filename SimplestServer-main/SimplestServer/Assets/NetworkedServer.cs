@@ -161,6 +161,7 @@ public class NetworkedServer : MonoBehaviour
             {
                 //SendMessageToClient(ServerToClientSignifier.ObserveStart + "",id);
                 gameRooms[Random.Range(0, gameRooms.Count)].observers.Add(id);
+                Debug.Log(gameRooms[Random.Range(0, gameRooms.Count)].observers + " : observer");
                 //gr.observers.Add(id);
                 SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
                 GameRoom gr = GetGameRoomWithClientID(id);
@@ -192,11 +193,13 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
                 }
-                else
+                else if(gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -210,11 +213,13 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
                 }
-                else
+                else if(gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -228,11 +233,13 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
                 }
-                else
+                else if (gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID2);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -246,27 +253,27 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID1);
-                    foreach (GameRoom gameRoom in gameRooms)
-                    {
-                        foreach (int Observer in gameRoom.observers)
-                        {
-                            SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gameRoom.observers[Observer]);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
+                    //foreach (int Observer in gr.observers)
+                    //{
+                    //    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[Observer-1]);
 
-                        }
-                    }
+                    //}
+
                 }
-                else
+                else if (gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID2);
-                    foreach (GameRoom gameRoom in gameRooms)
-                    {
-                        foreach (int Observer in gameRoom.observers)
-                        {
-                            SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gameRoom.observers[Observer]);
+                    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
+                    //foreach (GameRoom gameRoom in gameRooms)
+                    //{
+                    //    foreach (int Observer in gameRoom.observers)
+                    //    {
+                    //        SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gameRoom.observers[Observer]);
 
-                        }
-                    }
+                    //    }
+                    //}
                 }
             }
         }
