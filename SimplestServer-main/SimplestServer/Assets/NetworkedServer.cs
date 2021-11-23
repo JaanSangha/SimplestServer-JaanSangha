@@ -140,19 +140,30 @@ public class NetworkedServer : MonoBehaviour
         }
         else if (Signifier == ClientToServerSignifier.JoinQueueForGame)
         {
-            if (playerWaitingForMatchWithID == -1)
+            if (gameRooms.Count == 0)
             {
-                playerWaitingForMatchWithID = id;
+                if (playerWaitingForMatchWithID == -1)
+                {
+                    playerWaitingForMatchWithID = id;
+                }
+                else
+                {
+                    GameRoom gr = new GameRoom(playerWaitingForMatchWithID, id);
+                    gameRooms.Add(gr);
+
+                    SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID1);
+                    SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID2);
+
+                    playerWaitingForMatchWithID = -1;
+                }
             }
             else
             {
-                GameRoom gr = new GameRoom(playerWaitingForMatchWithID, id);
-                gameRooms.Add(gr);
-
-                SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID1);
-                SendMessageToClient(ServerToClientSignifier.GameStart + "", gr.playerID2);
-
-                playerWaitingForMatchWithID = -1;
+                //SendMessageToClient(ServerToClientSignifier.ObserveStart + "",id);
+                gameRooms[Random.Range(0, gameRooms.Count)].observers.Add(id);
+                //gr.observers.Add(id);
+                SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
+                GameRoom gr = GetGameRoomWithClientID(id);
             }
         }
         else if (Signifier == ClientToServerSignifier.TicTacToeSomethingPlay)
@@ -235,11 +246,27 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID1);
+                    foreach (GameRoom gameRoom in gameRooms)
+                    {
+                        foreach (int Observer in gameRoom.observers)
+                        {
+                            SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gameRoom.observers[Observer]);
+
+                        }
+                    }
                 }
                 else
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID2);
+                    foreach (GameRoom gameRoom in gameRooms)
+                    {
+                        foreach (int Observer in gameRoom.observers)
+                        {
+                            SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gameRoom.observers[Observer]);
+
+                        }
+                    }
                 }
             }
         }
@@ -247,7 +274,7 @@ public class NetworkedServer : MonoBehaviour
         {
            if(gameRooms.Count>0)
             {
-                gameRooms[Random.Range(0, gameRooms.Count)].observersID.Add(id);
+                gameRooms[Random.Range(0, gameRooms.Count)].observers.Add(id);
                 SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
                 GameRoom gr = GetGameRoomWithClientID(id);
             }
@@ -323,6 +350,10 @@ public static class ServerToClientSignifier
     public const int QuickChatThreeSent = 13;
     public const int QuickChatFourSent = 14;
     public const int ObserveStart = 15;
+    public const int QuickChatOneObserver = 16;
+    public const int QuickChatTwoObserver = 17;
+    public const int QuickChatThreeObserver = 18;
+    public const int QuickChatFourObserver = 19;
 }
 public class PlayerAccount
 {
@@ -336,12 +367,13 @@ public class PlayerAccount
 
 public class GameRoom
 {
-    public List<int> observersID = new List<int>();
     public int playerID1, playerID2;
+    public List<int> observers;
 
     public GameRoom(int PlayerID1, int PlayerID2)
     {
         playerID1 = PlayerID1;
         playerID2 = PlayerID2;
+        observers = new List<int>();
     }
 }
