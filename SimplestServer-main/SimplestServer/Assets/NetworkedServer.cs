@@ -193,13 +193,15 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID1);
+                    if (gr.observers.Count >0)
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
                 }
                 else if(gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID2);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -213,13 +215,15 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID1);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
                 }
                 else if(gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID2);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -233,13 +237,15 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID1);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
                 }
                 else if (gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatThreeSent + "", gr.playerID2);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatThreeObserver + "", gr.observers[0]);
                 }
             }
         }
@@ -253,7 +259,8 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID1);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
                     //foreach (int Observer in gr.observers)
                     //{
                     //    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[Observer-1]);
@@ -265,7 +272,8 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatFourSent + "", gr.playerID2);
-                    SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatFourObserver + "", gr.observers[0]);
                     //foreach (GameRoom gameRoom in gameRooms)
                     //{
                     //    foreach (int Observer in gameRoom.observers)
@@ -285,6 +293,27 @@ public class NetworkedServer : MonoBehaviour
                 SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
                 GameRoom gr = GetGameRoomWithClientID(id);
             }
+        }
+        else if (Signifier == ClientToServerSignifier.MessageSent)
+        {
+            GameRoom gr = GetGameRoomWithClientID(id);
+            if (gr.playerID1 == id)
+            {
+                SendMessageToClient(ServerToClientSignifier.MessageSent + "," + csv[1] + ":" + csv[2], gr.playerID1);
+                SendMessageToClient(ServerToClientSignifier.MessageRecieved + "," + csv[1] + ":" + csv[2], gr.playerID2);
+
+                if (gr.observers.Count > 0)
+                    SendMessageToClient(ServerToClientSignifier.MessageRecieved + "," + csv[1] + ":" + csv[2], gr.observers[0]);
+            }
+            else if (gr.playerID2 == id)
+            {
+                SendMessageToClient(ServerToClientSignifier.MessageRecieved + "," + csv[1] + ":" + csv[2], gr.playerID1);
+                SendMessageToClient(ServerToClientSignifier.MessageSent + "," + csv[1] + ":" + csv[2], gr.playerID2);
+
+                if (gr.observers.Count > 0)
+                    SendMessageToClient(ServerToClientSignifier.MessageRecieved + "," + csv[1] + ":" + csv[2], gr.observers[0]);
+            }
+
         }
 
 
@@ -339,6 +368,7 @@ public static class ClientToServerSignifier
     public const int QuickChatThree = 7;
     public const int QuickChatFour = 8;
     public const int JoinQueueToObserve = 9;
+    public const int MessageSent = 10;
 }
 public static class ServerToClientSignifier
 {
@@ -361,6 +391,9 @@ public static class ServerToClientSignifier
     public const int QuickChatTwoObserver = 17;
     public const int QuickChatThreeObserver = 18;
     public const int QuickChatFourObserver = 19;
+    public const int MessageRecieved = 20;
+    public const int MessageSent = 21;
+    public const int MessageObserver = 21;
 }
 public class PlayerAccount
 {
