@@ -21,7 +21,9 @@ public class NetworkedServer : MonoBehaviour
     int playerWaitingForMatchWithID = -1;
     List<GameRoom> gameRooms;
     LinkedList<PlayerMoves> pressedButtons;
+    List<int> slotsPlayed;
     int turn = 1;
+    int arrayNum = 0;
     
     // Start is called before the first frame update
     void Start()
@@ -40,6 +42,10 @@ public class NetworkedServer : MonoBehaviour
         pressedButtons = new LinkedList<PlayerMoves>();
 
         gameRooms = new List<GameRoom>();
+        File.Delete(Application.dataPath + Path.DirectorySeparatorChar + "PlayerMoves.txt");
+#if UNITY_EDITOR
+        UnityEditor.AssetDatabase.Refresh();
+#endif
     }
 
     // Update is called once per frame
@@ -200,10 +206,10 @@ public class NetworkedServer : MonoBehaviour
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID2);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID1);
-                    if (gr.observers.Count >0)
-                    SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
+                    if (gr.observers.Count > 0)
+                        SendMessageToClient(ServerToClientSignifier.QuickChatOneObserver + "", gr.observers[0]);
                 }
-                else if(gr.playerID2 == id)
+                else if (gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatOneSent + "", gr.playerID2);
@@ -225,7 +231,7 @@ public class NetworkedServer : MonoBehaviour
                     if (gr.observers.Count > 0)
                         SendMessageToClient(ServerToClientSignifier.QuickChatTwoObserver + "", gr.observers[0]);
                 }
-                else if(gr.playerID2 == id)
+                else if (gr.playerID2 == id)
                 {
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoRecieved + "", gr.playerID1);
                     SendMessageToClient(ServerToClientSignifier.QuickChatTwoSent + "", gr.playerID2);
@@ -294,7 +300,7 @@ public class NetworkedServer : MonoBehaviour
         }
         else if (Signifier == ClientToServerSignifier.JoinQueueToObserve)
         {
-           if(gameRooms.Count>0)
+            if (gameRooms.Count > 0)
             {
                 gameRooms[Random.Range(0, gameRooms.Count)].observers.Add(id);
                 SendMessageToClient(ServerToClientSignifier.ObserveStart + "", id);
@@ -335,12 +341,12 @@ public class NetworkedServer : MonoBehaviour
                 pressedButtons.AddLast(newPlayerMoves);
                 SavePlayerMoves();
 
-                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + ","  + temp + ",", gr.playerID1);
-                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + ","  + temp + ",", gr.playerID2);
+                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + "," + temp + ",", gr.playerID1);
+                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + "," + temp + ",", gr.playerID2);
 
                 if (gr.observers.Count > 0)
 
-                    SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + ","  + temp + ",", gr.observers[0]);
+                    SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 1 + "," + temp + ",", gr.observers[0]);
 
             }
             else if (turn == 2 && gr.playerID2 == id)
@@ -350,14 +356,27 @@ public class NetworkedServer : MonoBehaviour
                 pressedButtons.AddLast(newPlayerMoves);
                 SavePlayerMoves();
 
-                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 + ","  + temp + "," , gr.playerID1);
-                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 + ","  + temp + "," , gr.playerID2);
+                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 + "," + temp + ",", gr.playerID1);
+                SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 + "," + temp + ",", gr.playerID2);
                 if (gr.observers.Count > 0)
 
-                    SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 +  "," + temp + ",", gr.observers[0]);
+                    SendMessageToClient(ServerToClientSignifier.SlotRecieved + "," + 2 + "," + temp + ",", gr.observers[0]);
 
             }
+        }
+        else if (Signifier == ClientToServerSignifier.ReplayButton)
+        {
+            LoadPlayerMoves();
+            GameRoom gr = GetGameRoomWithClientID(id);
 
+            foreach (PlayerMoves pa in pressedButtons)
+            {
+                //Debug.Log("PlayerID: " + pa.playerID + " SlotPicked: " + pa.slot);
+                SendMessageToClient(ServerToClientSignifier.PlayReplay + "," + pa.playerID + "," + pa.slot + "," + arrayNum + ",", gr.playerID1);
+                SendMessageToClient(ServerToClientSignifier.PlayReplay + "," + pa.playerID + "," + pa.slot + "," + arrayNum + ",", gr.playerID2);
+                arrayNum++;
+            }
+            // Debug.Log(pressedButtons.First);
         }
 
     }
@@ -385,6 +404,7 @@ public class NetworkedServer : MonoBehaviour
                 {
                     PlayerMoves pa = new PlayerMoves(csv[1], csv[2]);
                     pressedButtons.AddLast(pa);
+                    //slotsPlayed.Add(int.Parse(csv[2]));
                 }
             }
             sr.Close();
