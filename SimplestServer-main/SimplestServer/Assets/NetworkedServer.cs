@@ -371,12 +371,10 @@ public class NetworkedServer : MonoBehaviour
 
             foreach (PlayerMoves pa in pressedButtons)
             {
-                //Debug.Log("PlayerID: " + pa.playerID + " SlotPicked: " + pa.slot);
                 SendMessageToClient(ServerToClientSignifier.PlayReplay + "," + pa.playerID + "," + pa.slot + "," + arrayNum + ",", gr.playerID1);
                 SendMessageToClient(ServerToClientSignifier.PlayReplay + "," + pa.playerID + "," + pa.slot + "," + arrayNum + ",", gr.playerID2);
                 arrayNum++;
             }
-            // Debug.Log(pressedButtons.First);
         }
 
     }
@@ -404,7 +402,6 @@ public class NetworkedServer : MonoBehaviour
                 {
                     PlayerMoves pa = new PlayerMoves(csv[1], csv[2]);
                     pressedButtons.AddLast(pa);
-                    //slotsPlayed.Add(int.Parse(csv[2]));
                 }
             }
             sr.Close();
